@@ -1,5 +1,6 @@
 using ECommerce.Entities;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace ECommerce.Repositories
 {
@@ -8,6 +9,7 @@ namespace ECommerce.Repositories
         private const string databaseName = "ecommerce";
         private const string collectionName = "products";
         private readonly IMongoCollection<Product> productsCollection;
+        private readonly FilterDefinitionBuilder<Product> filterBuilder = Builders<Product>.Filter;
         public MongoDbProductsRepository(IMongoClient mongoClient) 
         {
             IMongoDatabase database = mongoClient.GetDatabase(databaseName);
@@ -20,22 +22,25 @@ namespace ECommerce.Repositories
 
         public void DeleteProduct(Guid id)
         {
-            throw new NotImplementedException();
+            var filter = filterBuilder.Eq(product => product.Id, id);
+            productsCollection.DeleteOne(filter);
         }
 
         public Product GetProduct(Guid id)
         {
-            throw new NotImplementedException();
+            var filter = filterBuilder.Eq(product => product.Id, id);
+            return productsCollection.Find(filter).SingleOrDefault();
         }
 
         public IEnumerable<Product> GetProducts()
         {
-            throw new NotImplementedException();
+            return productsCollection.Find(new BsonDocument()).ToList();
         }
 
         public void UpdateProduct(Product updatedProduct)
         {
-            throw new NotImplementedException();
+            var filter = filterBuilder.Eq(existingProduct => existingProduct.Id,updatedProduct.Id);
+            productsCollection.ReplaceOne(filter, updatedProduct);
         }
     }
 }
