@@ -13,31 +13,35 @@ namespace ECommerce.Repositories
         };
 
 
-        public IEnumerable<Product> GetProducts()
+        public async Task<IEnumerable<Product>> GetProductsAsync()
         {
-            return products;
+            return await Task.FromResult(products);
         }
 
-        public Product GetProduct(Guid id)
+        public async Task<Product> GetProductAsync(Guid id)
         {
-            return products.Where(item => item.Id == id).SingleOrDefault();
+            var item = products.Where(item => item.Id == id).SingleOrDefault();
+            return await Task.FromResult(item);
         }
 
-        public void CreateProduct(Product newProduct)
+        public async Task CreateProductAsync(Product newProduct)
         {
             products.Add(newProduct);
+            await Task.CompletedTask;
         }
 
-        public void UpdateProduct(Product updatedProduct)
+        public async Task UpdateProductAsync(Product updatedProduct)
         {
             var index = products.FindIndex(existingProduct => existingProduct.Id == updatedProduct.Id);
             products[index] = updatedProduct;
+            await Task.CompletedTask;
         }
 
-        public void DeleteProduct(Guid id)
+        public async Task DeleteProductAsync(Guid id)
         {
             var index = products.FindIndex(product => product.Id == id);
             products.RemoveAt(index);
+            await Task.CompletedTask;
         }
     }
 

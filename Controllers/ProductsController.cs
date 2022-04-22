@@ -19,17 +19,18 @@ namespace ECommerce.Controllers
 
         // GET /products
         [HttpGet]
-       public IEnumerable<ProductDto> GetProducts()
+       public async Task<IEnumerable<ProductDto>> GetProductsAsync()
         {
-            var products = repository.GetProducts().Select(product => product.AsDto());
+            var products = (await repository.GetProductsAsync())
+                .Select(product => product.AsDto());
             return products;
         }
 
         // GET /products/{id}
         [HttpGet("{id}")]
-        public ActionResult<ProductDto> GetProduct(Guid id)
+        public async Task<ActionResult<ProductDto>> GetProductAsync(Guid id)
         {
-            var product = repository.GetProduct(id);
+            var product = await repository.GetProductAsync(id);
 
             if (product is null)
             {
@@ -41,7 +42,7 @@ namespace ECommerce.Controllers
 
         // POST /products
         [HttpPost]
-        public ActionResult<ProductDto> CreateProduct(CreateProductDto productDto)
+        public async Task<ActionResult<ProductDto>> CreateProductAsync(CreateProductDto productDto)
         {
             Product newProduct = new()
             {
@@ -52,16 +53,16 @@ namespace ECommerce.Controllers
                 CreatedDate = DateTimeOffset.UtcNow,
             };
 
-            repository.CreateProduct(newProduct);
+            await repository.CreateProductAsync(newProduct);
 
-            return CreatedAtAction(nameof(GetProduct), new { id = newProduct.Id }, newProduct.AsDto());
+            return CreatedAtAction(nameof(GetProductAsync), new { id = newProduct.Id }, newProduct.AsDto());
         }
 
         // PUT /items/{id}
         [HttpPut("{id}")]
-        public ActionResult UpdateProduct(Guid id, UpdateProductDto productDto)
+        public async Task<ActionResult> UpdateProductAsync(Guid id, UpdateProductDto productDto)
         {
-            var existingProduct = repository.GetProduct(id);
+            var existingProduct = await repository.GetProductAsync(id);
 
             if (existingProduct is null)
             {
@@ -75,22 +76,22 @@ namespace ECommerce.Controllers
                 Price = productDto.Price,
             };
 
-            repository.UpdateProduct(updatedProduct);
+            await repository.UpdateProductAsync(updatedProduct);
             return NoContent();
         }
 
         // DELETE /products/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteProduct(Guid id)
+        public async  Task<ActionResult> DeleteProductAsync(Guid id)
         {
-            var existingProduct = repository.GetProduct(id);
+            var existingProduct = await repository.GetProductAsync(id);
 
             if (existingProduct is null)
             {
                 return NotFound();
             }
 
-            repository.DeleteProduct(id);
+            await repository.DeleteProductAsync(id);
             return NoContent();
         }
     }
